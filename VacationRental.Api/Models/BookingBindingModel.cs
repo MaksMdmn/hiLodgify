@@ -8,11 +8,11 @@ namespace VacationRental.Api.Models
 
         public DateTime Start
         {
-            get => _startIgnoreTime;
-            set => _startIgnoreTime = value.Date;
+            get => startIgnoreTime;
+            set => startIgnoreTime = value.Date;
         }
 
-        private DateTime _startIgnoreTime;
+        DateTime startIgnoreTime;
         public int Nights { get; set; }
     }
 }

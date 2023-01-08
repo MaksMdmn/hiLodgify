@@ -9,15 +9,15 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        private readonly IDictionary<int, RentalViewModel> _rentals;
-        private readonly IDictionary<int, BookingViewModel> _bookings;
+        readonly IDictionary<int, RentalViewModel> rentals;
+        readonly IDictionary<int, BookingViewModel> bookings;
 
         public CalendarController(
             IDictionary<int, RentalViewModel> rentals,
             IDictionary<int, BookingViewModel> bookings)
         {
-            _rentals = rentals;
-            _bookings = bookings;
+            this.rentals = rentals;
+            this.bookings = bookings;
         }
 
         [HttpGet]
@@ -25,7 +25,7 @@ namespace VacationRental.Api.Controllers
         {
             if (nights < 0)
                 throw new ApplicationException("Nights must be positive");
-            if (!_rentals.ContainsKey(rentalId))
+            if (!rentals.ContainsKey(rentalId))
                 throw new ApplicationException("Rental not found");
 
             var result = new CalendarViewModel 
@@ -41,7 +41,7 @@ namespace VacationRental.Api.Controllers
                     Bookings = new List<CalendarBookingViewModel>()
                 };
 
-                foreach (var booking in _bookings.Values)
+                foreach (var booking in bookings.Values)
                 {
                     if (booking.RentalId == rentalId
                         && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)

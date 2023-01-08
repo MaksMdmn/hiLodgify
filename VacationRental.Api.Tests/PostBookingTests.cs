@@ -10,11 +10,11 @@ namespace VacationRental.Api.Tests
     [Collection("Integration")]
     public class PostBookingTests
     {
-        private readonly HttpClient _client;
+        readonly HttpClient client;
 
         public PostBookingTests(IntegrationFixture fixture)
         {
-            _client = fixture.Client;
+            client = fixture.Client;
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postRentalResult;
-            using (var postRentalResponse = await _client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
+            using (var postRentalResponse = await client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
             {
                 Assert.True(postRentalResponse.IsSuccessStatusCode);
                 postRentalResult = await postRentalResponse.Content.ReadAsAsync<ResourceIdViewModel>();
@@ -40,13 +40,13 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postBookingResult;
-            using (var postBookingResponse = await _client.PostAsJsonAsync($"/api/v1/bookings", postBookingRequest))
+            using (var postBookingResponse = await client.PostAsJsonAsync($"/api/v1/bookings", postBookingRequest))
             {
                 Assert.True(postBookingResponse.IsSuccessStatusCode);
                 postBookingResult = await postBookingResponse.Content.ReadAsAsync<ResourceIdViewModel>();
             }
 
-            using (var getBookingResponse = await _client.GetAsync($"/api/v1/bookings/{postBookingResult.Id}"))
+            using (var getBookingResponse = await client.GetAsync($"/api/v1/bookings/{postBookingResult.Id}"))
             {
                 Assert.True(getBookingResponse.IsSuccessStatusCode);
 
@@ -66,7 +66,7 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postRentalResult;
-            using (var postRentalResponse = await _client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
+            using (var postRentalResponse = await client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
             {
                 Assert.True(postRentalResponse.IsSuccessStatusCode);
                 postRentalResult = await postRentalResponse.Content.ReadAsAsync<ResourceIdViewModel>();
@@ -79,7 +79,7 @@ namespace VacationRental.Api.Tests
                 Start = new DateTime(2002, 01, 01)
             };
 
-            using (var postBooking1Response = await _client.PostAsJsonAsync($"/api/v1/bookings", postBooking1Request))
+            using (var postBooking1Response = await client.PostAsJsonAsync($"/api/v1/bookings", postBooking1Request))
             {
                 Assert.True(postBooking1Response.IsSuccessStatusCode);
             }
@@ -93,7 +93,7 @@ namespace VacationRental.Api.Tests
 
             await Assert.ThrowsAsync<ApplicationException>(async () =>
             {
-                using (var postBooking2Response = await _client.PostAsJsonAsync($"/api/v1/bookings", postBooking2Request))
+                using (var postBooking2Response = await client.PostAsJsonAsync($"/api/v1/bookings", postBooking2Request))
                 {
                 }
             });
