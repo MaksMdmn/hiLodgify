@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using VacationRental.Api.Models;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
@@ -27,7 +26,7 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postRentalResult;
-            using (var postRentalResponse = await client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
+            using (var postRentalResponse = await client.PostAsJsonAsync("/api/v1/rentals", postRentalRequest))
             {
                 Assert.True(postRentalResponse.IsSuccessStatusCode);
                 postRentalResult = await postRentalResponse.Content.ReadAsAsync<ResourceIdViewModel>();
@@ -41,7 +40,7 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postBookingResult;
-            using (var postBookingResponse = await client.PostAsJsonAsync($"/api/v1/bookings", postBookingRequest))
+            using (var postBookingResponse = await client.PostAsJsonAsync("/api/v1/bookings", postBookingRequest))
             {
                 Assert.True(postBookingResponse.IsSuccessStatusCode);
                 postBookingResult = await postBookingResponse.Content.ReadAsAsync<ResourceIdViewModel>();
@@ -67,7 +66,7 @@ namespace VacationRental.Api.Tests
             };
 
             ResourceIdViewModel postRentalResult;
-            using (var postRentalResponse = await client.PostAsJsonAsync($"/api/v1/rentals", postRentalRequest))
+            using (var postRentalResponse = await client.PostAsJsonAsync("/api/v1/rentals", postRentalRequest))
             {
                 Assert.True(postRentalResponse.IsSuccessStatusCode);
                 postRentalResult = await postRentalResponse.Content.ReadAsAsync<ResourceIdViewModel>();
@@ -80,7 +79,7 @@ namespace VacationRental.Api.Tests
                 Start = new DateTime(2002, 01, 01)
             };
 
-            using (var postBooking1Response = await client.PostAsJsonAsync($"/api/v1/bookings", postBooking1Request))
+            using (var postBooking1Response = await client.PostAsJsonAsync("/api/v1/bookings", postBooking1Request))
             {
                 Assert.True(postBooking1Response.IsSuccessStatusCode);
             }
@@ -94,9 +93,7 @@ namespace VacationRental.Api.Tests
 
             await Assert.ThrowsAsync<ApplicationException>(async () =>
             {
-                using (var postBooking2Response = await client.PostAsJsonAsync($"/api/v1/bookings", postBooking2Request))
-                {
-                }
+                using (await client.PostAsJsonAsync("/api/v1/bookings", postBooking2Request)) { }
             });
         }
     }

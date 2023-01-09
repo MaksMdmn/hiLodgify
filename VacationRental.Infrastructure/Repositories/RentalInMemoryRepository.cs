@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using VacationRental.Domain.Aggregates.RentalAggregate;
@@ -7,7 +8,7 @@ namespace VacationRental.Infrastructure.Repositories
 {
     public class RentalInMemoryRepository : IRentalRepository
     {
-        readonly IDictionary<int, Rental> rentals = new Dictionary<int, Rental>();
+        readonly IDictionary<int, Rental> rentals = new ConcurrentDictionary<int, Rental>();
 
         public int Add(Rental rental)
         {
@@ -28,7 +29,7 @@ namespace VacationRental.Infrastructure.Repositories
 
         public Rental GetByBookingId(int bookingId)
         {
-            var result = rentals.Values.SingleOrDefault(rental => 
+            var result = rentals.Values.FirstOrDefault(rental => 
                 rental.Bookings.Any(booking => booking.Id == bookingId));
             
             if (result == null)

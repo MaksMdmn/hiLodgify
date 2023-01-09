@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using VacationRental.Api.Interfaces;
 using VacationRental.Api.Models.ViewModels;
 using VacationRental.Domain.Aggregates.RentalAggregate;
@@ -10,10 +11,12 @@ namespace VacationRental.Api.Services
     public class CalendarService : ICalendarService
     {
         readonly IRentalRepository rentals;
+        readonly IMapper mapper;
 
-        public CalendarService(IRentalRepository rentals)
+        public CalendarService(IRentalRepository rentals, IMapper mapper)
         {
             this.rentals = rentals;
+            this.mapper = mapper;
         }
 
         public CalendarViewModel Create(int rentalId, DateTime start, int nights)
@@ -24,7 +27,9 @@ namespace VacationRental.Api.Services
             
             for (var i = 0; i < nights; i++)
             {
-                dates.Add(CalendarDate(rental, start.Date.AddDays(i)));
+                var date = start.Date.AddDays(i);
+                
+                dates.Add(CalendarDate(rental, date));
             }
 
             return new CalendarViewModel 
@@ -34,16 +39,16 @@ namespace VacationRental.Api.Services
             };
         }
 
-        static CalendarDateViewModel CalendarDate(Rental rental, DateTime date)
+        CalendarDateViewModel CalendarDate(Rental rental, DateTime date)
         {
             var bookings = rental.Bookings
                 .Where(booking => booking.IsOngoing(date))
-                .Select(booking => new CalendarBookingViewModel { Id = booking.Id, Unit = booking.Unit})
+                .Select(ToViewModel<CalendarBookingViewModel>)
                 .ToList();
             
             var preparations = rental.Preparations
                 .Where(preparation => preparation.IsOngoing(date))
-                .Select(preparation => new CalendarPreparationTimeViewModel { Unit = preparation.Unit })
+                .Select(ToViewModel<CalendarPreparationTimeViewModel>)
                 .ToList();
 
             return new CalendarDateViewModel
@@ -52,6 +57,11 @@ namespace VacationRental.Api.Services
                 Bookings = bookings,
                 PreparationTimes = preparations
             };
+        }
+        
+        TViewModel ToViewModel<TViewModel>(object source)
+        {
+            return mapper.Map<TViewModel>(source);
         }
     }
 }
