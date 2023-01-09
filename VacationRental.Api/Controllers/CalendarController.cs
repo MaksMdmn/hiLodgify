@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Interfaces;
 using VacationRental.Api.Models.ViewModels;
 
 namespace VacationRental.Api.Controllers
@@ -9,15 +9,11 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        readonly IDictionary<int, RentalViewModel> rentals;
-        readonly IDictionary<int, BookingViewModel> bookings;
+        readonly ICalendarService calendar;
 
-        public CalendarController(
-            IDictionary<int, RentalViewModel> rentals,
-            IDictionary<int, BookingViewModel> bookings)
+        public CalendarController(ICalendarService calendar)
         {
-            this.rentals = rentals;
-            this.bookings = bookings;
+            this.calendar = calendar;
         }
 
         [HttpGet]
@@ -25,35 +21,8 @@ namespace VacationRental.Api.Controllers
         {
             if (nights < 0)
                 throw new ApplicationException("Nights must be positive");
-            if (!rentals.ContainsKey(rentalId))
-                throw new ApplicationException("Rental not found");
 
-            var result = new CalendarViewModel 
-            {
-                RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>() 
-            };
-            for (var i = 0; i < nights; i++)
-            {
-                var date = new CalendarDateViewModel
-                {
-                    Date = start.Date.AddDays(i),
-                    Bookings = new List<CalendarBookingViewModel>()
-                };
-
-                foreach (var booking in bookings.Values)
-                {
-                    if (booking.RentalId == rentalId
-                        && booking.Start <= date.Date && booking.Start.AddDays(booking.Nights) > date.Date)
-                    {
-                        date.Bookings.Add(new CalendarBookingViewModel { Id = booking.Id });
-                    }
-                }
-
-                result.Dates.Add(date);
-            }
-
-            return result;
+            return calendar.Create(rentalId, start, nights);;
         }
     }
 }
