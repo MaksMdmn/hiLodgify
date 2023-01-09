@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VacationRental.Api.Models
+namespace VacationRental.Api.Models.BindingModels
 {
     public class BookingBindingModel
     {
         public int RentalId { get; set; }
 
-        //TODO: better to do in business layer
         public DateTime Start
         {
             get => startIgnoreTime;
@@ -16,7 +15,6 @@ namespace VacationRental.Api.Models
 
         DateTime startIgnoreTime;
         
-        [Range(1, int.MaxValue)]
         public int Nights { get; set; }
     }
 }

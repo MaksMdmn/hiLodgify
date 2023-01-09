@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using VacationRental.Api.Models;
+using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 
@@ -10,10 +12,12 @@ namespace VacationRental.Api.Controllers
     public class RentalsController : ControllerBase
     {
         readonly IRentalRepository rentals;
+        readonly IMapper mapper;
 
-        public RentalsController(IRentalRepository rentals)
+        public RentalsController(IRentalRepository rentals, IMapper mapper)
         {
             this.rentals = rentals;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -21,9 +25,8 @@ namespace VacationRental.Api.Controllers
         public RentalViewModel Get(int rentalId)
         {
             var rental = rentals.GetOne(rentalId);
-            
-            //TODO: error handling ?
-            return new RentalViewModel { Id = rental.Id, Units = rental.Units, PreparationTimeInDays = rental.PreparationTimeInDays };
+
+            return ToViewModel<RentalViewModel>(rental);
         }
 
         [HttpPost]
@@ -32,9 +35,18 @@ namespace VacationRental.Api.Controllers
             var rental = new Rental(model.Units, model.PreparationTimeInDays);
 
             var id = rentals.Add(rental);
-            
-            //TODO: mapping
+
+            return ToViewModel(id);
+        }
+        
+        static ResourceIdViewModel ToViewModel(int id)
+        {
             return new ResourceIdViewModel { Id = id };
+        }
+
+        TViewModel ToViewModel<TViewModel>(object source)
+        {
+            return mapper.Map<TViewModel>(source);
         }
     }
 }

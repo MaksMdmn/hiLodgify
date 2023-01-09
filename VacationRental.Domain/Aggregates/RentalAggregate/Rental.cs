@@ -38,17 +38,23 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 
         int FindAvailableUnit(DateTime start, int nights)
         {
-            var occupied = CountOccupiedUnits(start, nights);
-            
-            if (occupied >= Units)
-                throw new ApplicationException("Not available");
+            var unavailable = BookedUnits(start, nights)
+                .Concat(UnpreparedUnits(start, nights))
+                .Distinct()
+                .ToList();
 
-            return AvailableUnitNumber(occupied);
+            for (var i = 1; i <= Units; i++)
+            {
+                if (!unavailable.Contains(i))
+                    return i;
+            }
+            
+            throw new ApplicationException("Not available");
         }
 
         Booking BookUnit(int unit, DateTime start, int nights)
         {
-            var result = new Booking(BookingId(), unit, start, nights);
+            var result = new Booking(BookingId(), Id, unit, start, nights);
             
             bookings.Add(result);
 
@@ -60,20 +66,25 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
             preparations.Add(new PreparationTime(booking.End, booking.Unit, PreparationTimeInDays));
         }
 
-        int CountOccupiedUnits(DateTime start, int nights)
-        {
-            return bookings.Count(booking => booking.IsOngoing(start, nights)) 
-                   + preparations.Count(preparation => preparation.IsOngoing(start, nights));
-        }
-
-        static int AvailableUnitNumber(int occupied)
-        {
-            return occupied + 1;
-        }
-
         int BookingId()
         {
             return bookings.Count + 1;
+        }
+
+        int[] BookedUnits(DateTime start, int nights)
+        {
+            return bookings
+                .Where(booking => booking.IsOngoing(start, nights))
+                .Select(booking => booking.Unit)
+                .ToArray();
+        }
+        
+        int[] UnpreparedUnits(DateTime start, int nights)
+        {
+            return preparations
+                .Where(preparation => preparation.IsOngoing(start, nights))
+                .Select(preparation => preparation.Unit)
+                .ToArray();
         }
     }
 }

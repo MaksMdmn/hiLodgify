@@ -26,9 +26,15 @@ namespace VacationRental.Infrastructure.Repositories
             throw new ApplicationException("Rental not found");
         }
 
-        public Rental FindByBookingId(int bookingId)
+        public Rental GetByBookingId(int bookingId)
         {
-            return rentals.Values.Single(rental => rental.Bookings.Any(booking => booking.Id == bookingId));
+            var result = rentals.Values.SingleOrDefault(rental => 
+                rental.Bookings.Any(booking => booking.Id == bookingId));
+            
+            if (result == null)
+                throw new ApplicationException("Booking not found");
+
+            return result;
         }
 
         int NextId()

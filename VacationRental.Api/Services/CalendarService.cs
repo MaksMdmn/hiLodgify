@@ -18,24 +18,24 @@ namespace VacationRental.Api.Services
 
         public CalendarViewModel Create(int rentalId, DateTime start, int nights)
         {
-            var result = new CalendarViewModel 
-            {
-                RentalId = rentalId,
-                Dates = new List<CalendarDateViewModel>() 
-            };
+            var rental = rentals.GetOne(rentalId);
+
+            var dates = new List<CalendarDateViewModel>();
             
             for (var i = 0; i < nights; i++)
             {
-                result.Dates.Add(CalendarDate(rentalId, start.Date.AddDays(i)));
+                dates.Add(CalendarDate(rental, start.Date.AddDays(i)));
             }
 
-            return result;
+            return new CalendarViewModel 
+            {
+                RentalId = rentalId,
+                Dates = dates
+            };
         }
 
-        CalendarDateViewModel CalendarDate(int rentalId, DateTime date)
+        static CalendarDateViewModel CalendarDate(Rental rental, DateTime date)
         {
-            var rental = rentals.GetOne(rentalId);
-            
             var bookings = rental.Bookings
                 .Where(booking => booking.IsOngoing(date))
                 .Select(booking => new CalendarBookingViewModel { Id = booking.Id, Unit = booking.Unit})

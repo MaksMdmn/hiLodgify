@@ -6,6 +6,6 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 
         Rental GetOne(int id);
 
-        Rental FindByBookingId(int bookingId);
+        Rental GetByBookingId(int bookingId);
     }
 }

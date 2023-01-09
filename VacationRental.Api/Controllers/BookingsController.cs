@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using VacationRental.Api.Models;
+using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 
@@ -13,40 +13,45 @@ namespace VacationRental.Api.Controllers
     public class BookingsController : ControllerBase
     {
         readonly IRentalRepository rentals;
-        
-        public BookingsController(IRentalRepository rentals)
+        readonly IMapper mapper;
+
+        public BookingsController(IRentalRepository rentals, IMapper mapper)
         {
             this.rentals = rentals;
+            this.mapper = mapper;
         }
 
         [HttpGet]
         [Route("{bookingId:int}")]
         public BookingViewModel Get(int bookingId)
         {
-            //TODO: rework
-            var rental = rentals.FindByBookingId(bookingId);
-            var booking = rental.Bookings.First(b => b.Id == bookingId);
+            var booking = rentals.GetByBookingId(bookingId)
+                .Bookings.First(b => b.Id == bookingId);
 
-            //TODO: mapping
-            return new BookingViewModel
-            {
-                Id = booking.Id,
-                Nights = booking.Nights,
-                RentalId = rental.Id,
-                Start = booking.Start
-            };
+            return ToViewModel<BookingViewModel>(booking);
         }
 
         [HttpPost]
         public ResourceIdViewModel Post(BookingBindingModel model)
         {
+            if (model.Nights <= 0)
+                throw new ApplicationException("Nights must be positive");
+            
             var rental = rentals.GetOne(model.RentalId);
 
             var id = rental.TryBookUnit(model.Start, model.Nights);
 
+            return ToViewModel(id);
+        }
+
+        static ResourceIdViewModel ToViewModel(int id)
+        {
             return new ResourceIdViewModel { Id = id };
         }
 
-        
+        TViewModel ToViewModel<TViewModel>(object source)
+        {
+            return mapper.Map<TViewModel>(source);
+        }
     }
 }

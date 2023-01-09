@@ -22,22 +22,16 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
         
         public bool IsOngoing(DateTime date)
         {
-            return Start <= DateOnly(date) && End > DateOnly(date);
+            return Start <= date && End > date;
         }
         
-        public bool IsOngoing(DateTime start, int nights)
+        public bool IsOngoing(DateTime from, int nights)
         {
-            var startDate = DateOnly(start);
-            var endDate = startDate.AddDays(nights);
+            var until = from.AddDays(nights);
 
-            return Start <= startDate && End > startDate
-                   || (Start < endDate && End >= endDate)
-                   || (Start > startDate && End < endDate);
-        }
-        
-        static DateTime DateOnly(DateTime dateTime)
-        {
-            return dateTime.Date;
+            return Start <= from && End > until
+                   || (Start < until && End >= until)
+                   || (Start > from && End < until);
         }
     }
 }

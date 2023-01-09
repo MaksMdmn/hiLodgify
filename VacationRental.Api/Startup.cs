@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using AutoMapper;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +28,15 @@ namespace VacationRental.Api
 
             services.AddSwaggerGen(opts => opts.SwaggerDoc("v1", new Info { Title = "Vacation rental information", Version = "v1" }));
 
+            services.AddAutoMapper(CurrentAssembly());
+            
             services.AddSingleton<ICalendarService, CalendarService>();
             services.AddSingleton<IRentalRepository, RentalInMemoryRepository>();
+        }
+
+        static Assembly CurrentAssembly()
+        {
+            return Assembly.GetExecutingAssembly();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
