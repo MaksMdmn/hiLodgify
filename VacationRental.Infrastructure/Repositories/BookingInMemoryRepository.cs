@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using VacationRental.Domain.Aggregates.BookingAggregate;
@@ -8,20 +9,12 @@ namespace VacationRental.Infrastructure.Repositories
     {
         readonly IDictionary<int, Booking> bookings = new Dictionary<int, Booking>();
 
-        public int Add(Booking booking)
-        {
-            booking.Id = NextId();
-            
-            bookings.Add(booking.Id, booking);
-
-            return booking.Id;
-        }
-
         public Booking GetOne(int id)
         {
-            bookings.TryGetValue(id, out var result);
+            if (bookings.TryGetValue(id, out var result))
+                return result;
             
-            return result;
+            throw new ApplicationException("Rental not found");
         }
 
         public Booking[] GetManyByRenalId(int rentalId)
@@ -31,6 +24,15 @@ namespace VacationRental.Infrastructure.Repositories
                 .ToArray();
         }
         
+        public int Add(Booking booking)
+        {
+            booking.Id = NextId();
+            
+            bookings.Add(booking.Id, booking);
+
+            return booking.Id;
+        }
+
         int NextId()
         {
             return bookings.Keys.Count + 1;

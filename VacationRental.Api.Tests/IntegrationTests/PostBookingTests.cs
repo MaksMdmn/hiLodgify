@@ -6,7 +6,7 @@ using VacationRental.Api.Models.ViewModels;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace VacationRental.Api.Tests
+namespace VacationRental.Api.Tests.IntegrationTests
 {
     [Collection("Integration")]
     public class PostBookingTests
@@ -23,7 +23,7 @@ namespace VacationRental.Api.Tests
         [Fact]
         public async Task GivenCompleteRequest_WhenPostBooking_ThenAGetReturnsTheCreatedBooking()
         {
-            var postRentalRequest = new RentalBindingModel
+            var postRentalRequest = new CreateRentalBindingModel
             {
                 Units = 4
             };
@@ -68,7 +68,7 @@ namespace VacationRental.Api.Tests
         [Fact]
         public async Task GivenCompleteRequest_WhenPostBooking_ThenAPostReturnsErrorWhenThereIsOverbooking()
         {
-            var postRentalRequest = new RentalBindingModel
+            var postRentalRequest = new CreateRentalBindingModel
             {
                 Units = 1
             };

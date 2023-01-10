@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 
@@ -6,7 +7,15 @@ namespace VacationRental.Infrastructure.Repositories
     public class RentalInMemoryRepository : IRentalRepository
     {
         readonly IDictionary<int, Rental> rentals = new Dictionary<int, Rental>();
+        
+        public Rental GetOne(int id)
+        {
+            if (rentals.TryGetValue(id, out var result))
+                return result;
 
+            throw new ApplicationException("Rental not found");
+        }
+        
         public int Add(Rental rental)
         {
            rental.Id = NextId();
@@ -16,11 +25,9 @@ namespace VacationRental.Infrastructure.Repositories
            return rental.Id;
         }
 
-        public Rental GetOne(int id)
+        public void Update(Rental rental)
         {
-            rentals.TryGetValue(id, out var result);
-
-            return result;
+            rentals[rental.Id] = rental;
         }
 
         int NextId()

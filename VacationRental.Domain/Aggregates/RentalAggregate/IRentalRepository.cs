@@ -2,8 +2,10 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 {
     public interface IRentalRepository
     {
+        Rental GetOne(int id);
+
         int Add(Rental rental);
 
-        Rental GetOne(int id);
+        void Update(Rental rental);
     }
 }

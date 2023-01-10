@@ -7,22 +7,20 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 {
     public class Rental : IAggregateRoot, IEntity
     {
-        readonly int[] units;
         readonly List<PreparationTime> preparations = new List<PreparationTime>();
 
         public int Id { get; set; }
 
-        public int Units => units.Length;
+        public int Units { get; private set; }
 
-        public int PreparationTimeInDays { get; }
+        public int PreparationTimeInDays { get; private set; }
 
         public IReadOnlyCollection<PreparationTime> Preparations => preparations;
 
         public Rental(int units, int preparationTimeInDays)
         {
+            Units = units;
             PreparationTimeInDays = preparationTimeInDays;
-
-            this.units = Enumerable.Range(1, units).ToArray();
         }
 
         public void SchedulePreparation(DateTime start, int unit)
@@ -32,11 +30,27 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 
         public int[] FindPreparedUnits(DateTime start, int nights)
         {
-            return units.Except(preparations
+            return Enumerable.Range(1, Units).Except(preparations
                 .Where(preparation => preparation.IsOngoing(start, nights))
                 .Select(preparation => preparation.Unit))
                 .ToArray(); 
         }
-        
+
+        public void SetUnits(int units)
+        {
+            Units = units;
+        }
+
+        public void SetPreparationTimeInDays(int preparationTimeInDays, DateTime from)
+        {
+            PreparationTimeInDays = preparationTimeInDays;
+
+            var update = preparations.Where(preparation => preparation.Start >= from);
+
+            foreach (var preparation in update)
+            {
+                preparation.SetDays(PreparationTimeInDays);
+            }
+        }
     }
 }

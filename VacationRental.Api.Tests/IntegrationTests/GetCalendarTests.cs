@@ -5,7 +5,7 @@ using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
 
-namespace VacationRental.Api.Tests
+namespace VacationRental.Api.Tests.IntegrationTests
 {
     [Collection("Integration")]
     public class GetCalendarTests
@@ -20,7 +20,7 @@ namespace VacationRental.Api.Tests
         [Fact]
         public async Task GivenCompleteRequest_WhenGetCalendar_ThenAGetReturnsTheCalculatedCalendar()
         {
-            var postRentalRequest = new RentalBindingModel
+            var postRentalRequest = new CreateRentalBindingModel
             {
                 Units = 2
             };

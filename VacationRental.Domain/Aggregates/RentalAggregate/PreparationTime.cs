@@ -9,7 +9,7 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
         
         public int Unit { get; }
 
-        public int Days { get; }
+        public int Days { get; private set; }
         
         public DateTime End => Start.AddDays(Days);
 
@@ -32,6 +32,11 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
             return Start <= from && End > until
                    || (Start < until && End >= until)
                    || (Start > from && End < until);
+        }
+
+        public void SetDays(int days)
+        {
+            Days = days;
         }
     }
 }

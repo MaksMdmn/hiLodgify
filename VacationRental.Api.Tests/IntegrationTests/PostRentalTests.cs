@@ -4,7 +4,7 @@ using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
 
-namespace VacationRental.Api.Tests
+namespace VacationRental.Api.Tests.IntegrationTests
 {
     [Collection("Integration")]
     public class PostRentalTests
@@ -19,7 +19,7 @@ namespace VacationRental.Api.Tests
         [Fact]
         public async Task GivenCompleteRequest_WhenPostRental_ThenAGetReturnsTheCreatedRental()
         {
-            var request = new RentalBindingModel
+            var request = new CreateRentalBindingModel
             {
                 Units = 25
             };

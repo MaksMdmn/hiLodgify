@@ -21,4 +21,8 @@
     <ProjectReference Include="..\VacationRental.Api\VacationRental.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UnitTests" />
+  </ItemGroup>
+
 </Project>

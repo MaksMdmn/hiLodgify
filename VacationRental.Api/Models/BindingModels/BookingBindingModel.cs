@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace VacationRental.Api.Models.BindingModels
 {
@@ -14,6 +15,7 @@ namespace VacationRental.Api.Models.BindingModels
 
         DateTime startIgnoreTime;
         
+        [Range(1 , int.MaxValue)]
         public int Nights { get; set; }
     }
 }

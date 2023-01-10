@@ -26,9 +26,6 @@ namespace VacationRental.Api.Services
         {
             var booking = bookings.GetOne(bookingId);
             
-            if (booking == null)
-                throw new ApplicationException("Rental not found");
-
             return ToViewModel<BookingViewModel>(booking);
         }
 

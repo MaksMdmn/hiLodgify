@@ -24,11 +24,18 @@ namespace VacationRental.Api.Controllers
         }
 
         [HttpPost]
-        public ResourceIdViewModel Post(RentalBindingModel model)
+        public ResourceIdViewModel Post(CreateRentalBindingModel model)
         {
-            return service.CreateRental(model);
+            return service.Create(model);
         }
         
-
+        
+        //Response was not specified, so I did is as I thought would be right
+        [HttpPost]
+        [Route("{rentalId:int}")]
+        public RentalViewModel Put(int rentalId, UpdateRentalBindingModel model)
+        {
+            return service.Update(rentalId, model);
+        }
     }
 }
