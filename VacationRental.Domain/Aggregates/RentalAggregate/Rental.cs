@@ -38,11 +38,17 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 
         public void SetUnits(int units)
         {
+            if (units < 1)
+                throw new ApplicationException("Units cannot be less than 1");
+            
             Units = units;
         }
 
         public void SetPreparationTimeInDays(int preparationTimeInDays, DateTime from)
         {
+            if (preparationTimeInDays < 0)
+                throw new ApplicationException("Preparation time cannot be less than 0");
+            
             PreparationTimeInDays = preparationTimeInDays;
 
             var update = preparations.Where(preparation => preparation.Start >= from);

@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using AutoMapper;
-using VacationRental.Api.Interfaces;
+using VacationRental.Api.Application.Interfaces;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using VacationRental.Domain.Aggregates.BookingAggregate;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 
-namespace VacationRental.Api.Services
+namespace VacationRental.Api.Application.Services
 {
     public class BookingService : IBookingService
     {
@@ -37,7 +37,7 @@ namespace VacationRental.Api.Services
 
             var booking = BookUnit(rental.Id, unit, model.Start, model.Nights);
 
-            rental.SchedulePreparation(booking.End, unit);
+            SchedulePreparation(rental, booking.End, unit);
 
             return ToViewModel(booking.Id);
         }
@@ -62,6 +62,13 @@ namespace VacationRental.Api.Services
                 throw new ApplicationException("Not available");
 
             return availableUnits.First();
+        }
+        
+        void SchedulePreparation(Rental rental, DateTime from, int unit)
+        {
+            rental.SchedulePreparation(from, unit);
+
+            rentals.Update(rental);
         }
         
         int[] FindBookedUnits(int rentalId, DateTime start, int nights)

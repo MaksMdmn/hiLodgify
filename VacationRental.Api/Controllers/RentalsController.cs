@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using VacationRental.Api.Interfaces;
+using VacationRental.Api.Application.Interfaces;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 

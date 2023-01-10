@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
 using AutoMapper;
-using VacationRental.Api.Interfaces;
+using VacationRental.Api.Application.Extensions;
+using VacationRental.Api.Application.Interfaces;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using VacationRental.Domain.Aggregates.BookingAggregate;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 
-namespace VacationRental.Api.Services
+namespace VacationRental.Api.Application.Services
 {
     public class RentalService : IRentalService
     {
@@ -40,55 +41,38 @@ namespace VacationRental.Api.Services
 
         public RentalViewModel Update(int rentalId, UpdateRentalBindingModel model)
         {
-            var rental = rentals.GetOne(rentalId);
-
             var date = Today();
-
             var upcoming = UpcomingBookings(rentalId, date);
+            var duration = BookedPeriodInDays(upcoming, date);
+            
+            var simulation = SimulateBookings(upcoming, model.PreparationTimeInDays);
 
-            CheckUnitsAvailability(rental, upcoming, model.Units, date);
-            CheckPreparationsAvailability(rental, upcoming, model.PreparationTimeInDays);
+            for (var day = 0; day <= duration; day++)
+            {
+                var bookingsPerDay = simulation.Count(
+                    booking => booking.IsOngoing(date.AddDays(day)));
 
-            UpdateRental(rental, date, model);
+                if (bookingsPerDay > model.Units)
+                    throw new ApplicationException("Unable to change rental units value as it would affect existing bookings");
+            }
+
+            var rental = UpdateRental(rentalId, date, model);
 
             return ToViewModel<RentalViewModel>(rental);
         }
 
-        static void CheckUnitsAvailability(Rental rental, Booking[] upcoming, int updatedUnits, DateTime from)
+        static Booking[] SimulateBookings(Booking[] data, int adjustNights)
         {
-            if (!upcoming.Any())
-                return;
-            
-            if (updatedUnits >= rental.Units) 
-                return;
-            
-            var days = BookedPeriodInDays(upcoming, from);
-
-            for (var i = 0; i <= days; i++)
+            var copy = data.DeepCopy();
+                
+            foreach (var booking in data)
             {
-                var bookingsPerDay = upcoming.Count(booking => booking.IsOngoing(from.AddDays(i)));
-
-                if (bookingsPerDay > updatedUnits)
-                    throw new ApplicationException("Unable to change rental units value as it would affect existing bookings");
+                booking.SetNights(booking.Nights + adjustNights);
             }
+
+            return copy;
         }
 
-        static void CheckPreparationsAvailability(Rental rental, Booking[] upcoming, int preparationDays)
-        {
-            if (!upcoming.Any())
-                return;
-            
-            if (preparationDays <= rental.PreparationTimeInDays) 
-                return;
-
-            var count = upcoming
-                .TakeWhile((item, index) => IsOverlapping(upcoming, index, preparationDays))
-                .Count();
-            
-            if (count < upcoming.Length)
-                throw new ApplicationException("Unable to change rental preparation days value as it would affect existing bookings");
-        }
-        
         static int BookedPeriodInDays(Booking[] upcoming, DateTime from)
         {
             //Simplest, but not the best approach
@@ -96,22 +80,16 @@ namespace VacationRental.Api.Services
                 .Subtract(from).Days;
         }
         
-        static bool IsOverlapping(Booking[] upcoming, int index, int preparationDays)
+        Rental UpdateRental(int rentalId, DateTime date, UpdateRentalBindingModel model)
         {
-            if (index == upcoming.Length - 1)
-                return true;
+            var rental = rentals.GetOne(rentalId);
             
-            var updatedEnd = upcoming[index].End.AddDays(preparationDays);
-            
-            return upcoming[index + 1].IsOngoing(updatedEnd);
-        }
-
-        void UpdateRental(Rental rental, DateTime date, UpdateRentalBindingModel model)
-        {
             rental.SetUnits(model.Units);
             rental.SetPreparationTimeInDays(model.PreparationTimeInDays, date);
 
             rentals.Update(rental);
+
+            return rental;
         }
         
         Booking[] UpcomingBookings(int rentalId, DateTime from)

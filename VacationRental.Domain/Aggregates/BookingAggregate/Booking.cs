@@ -13,7 +13,7 @@ namespace VacationRental.Domain.Aggregates.BookingAggregate
 
         public DateTime Start { get; }
         
-        public int Nights { get; }
+        public int Nights { get; private set; }
         
         public DateTime End => Start.AddDays(Nights);
 
@@ -37,6 +37,14 @@ namespace VacationRental.Domain.Aggregates.BookingAggregate
             return Start <= from && End > from
                    || (Start < until && End >= until)
                    || (Start > from && End < until);
+        }
+
+        public void SetNights(int nights)
+        {
+            if (nights < 1)
+                throw new ApplicationException("Units cannot be less than 1");
+            
+            Nights = nights;
         }
     }
 }
