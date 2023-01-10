@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using VacationRental.Api.Interfaces;
 using VacationRental.Api.Services;
+using VacationRental.Domain.Aggregates.BookingAggregate;
 using VacationRental.Domain.Aggregates.RentalAggregate;
 using VacationRental.Infrastructure.Repositories;
 
@@ -28,15 +29,14 @@ namespace VacationRental.Api
 
             services.AddSwaggerGen(opts => opts.SwaggerDoc("v1", new Info { Title = "Vacation rental information", Version = "v1" }));
 
-            services.AddAutoMapper(CurrentAssembly());
+            ConfigureMapper(services);
             
+            services.AddSingleton<IRentalService, RentalService>();
+            services.AddSingleton<IBookingService, BookingService>();
             services.AddSingleton<ICalendarService, CalendarService>();
+            
             services.AddSingleton<IRentalRepository, RentalInMemoryRepository>();
-        }
-
-        static Assembly CurrentAssembly()
-        {
-            return Assembly.GetExecutingAssembly();
+            services.AddSingleton<IBookingRepository, BookingInMemoryRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -49,6 +49,13 @@ namespace VacationRental.Api
             app.UseMvc();
             app.UseSwagger();
             app.UseSwaggerUI(opts => opts.SwaggerEndpoint("/swagger/v1/swagger.json", "VacationRental v1"));
+        }
+
+        static void ConfigureMapper(IServiceCollection services)
+        {
+            var currentAssembly = Assembly.GetExecutingAssembly();
+            
+            services.AddAutoMapper(currentAssembly);
         }
     }
 }

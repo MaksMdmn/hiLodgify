@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace VacationRental.Api.Tests
 {
     [Collection("Integration")]
     public class PostBookingTests
     {
+        readonly ITestOutputHelper testOutputHelper;
         readonly HttpClient client;
 
-        public PostBookingTests(IntegrationFixture fixture)
+        public PostBookingTests(IntegrationFixture fixture, ITestOutputHelper testOutputHelper)
         {
+            this.testOutputHelper = testOutputHelper;
             client = fixture.Client;
         }
 
@@ -31,6 +34,8 @@ namespace VacationRental.Api.Tests
                 Assert.True(postRentalResponse.IsSuccessStatusCode);
                 postRentalResult = await postRentalResponse.Content.ReadAsAsync<ResourceIdViewModel>();
             }
+
+            testOutputHelper.WriteLine($"1st: {postRentalResult.Id}");
 
             var postBookingRequest = new BookingBindingModel
             {
@@ -51,6 +56,9 @@ namespace VacationRental.Api.Tests
                 Assert.True(getBookingResponse.IsSuccessStatusCode);
 
                 var getBookingResult = await getBookingResponse.Content.ReadAsAsync<BookingViewModel>();
+                
+                testOutputHelper.WriteLine($"1st: {postBookingRequest.RentalId}");
+
                 Assert.Equal(postBookingRequest.RentalId, getBookingResult.RentalId);
                 Assert.Equal(postBookingRequest.Nights, getBookingResult.Nights);
                 Assert.Equal(postBookingRequest.Start, getBookingResult.Start);

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using VacationRental.Api.Interfaces;
 using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
-using VacationRental.Domain.Aggregates.RentalAggregate;
 
 namespace VacationRental.Api.Controllers
 {
@@ -12,23 +10,18 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class BookingsController : ControllerBase
     {
-        readonly IRentalRepository rentals;
-        readonly IMapper mapper;
+        readonly IBookingService service;
 
-        public BookingsController(IRentalRepository rentals, IMapper mapper)
+        public BookingsController(IBookingService service)
         {
-            this.rentals = rentals;
-            this.mapper = mapper;
+            this.service = service;
         }
 
         [HttpGet]
         [Route("{bookingId:int}")]
         public BookingViewModel Get(int bookingId)
         {
-            var booking = rentals.GetByBookingId(bookingId)
-                .Bookings.First(b => b.Id == bookingId);
-
-            return ToViewModel<BookingViewModel>(booking);
+            return service.GetOne(bookingId);
         }
 
         [HttpPost]
@@ -36,22 +29,8 @@ namespace VacationRental.Api.Controllers
         {
             if (model.Nights <= 0)
                 throw new ApplicationException("Nights must be positive");
-            
-            var rental = rentals.GetOne(model.RentalId);
 
-            var id = rental.TryBookUnit(model.Start, model.Nights);
-
-            return ToViewModel(id);
-        }
-
-        static ResourceIdViewModel ToViewModel(int id)
-        {
-            return new ResourceIdViewModel { Id = id };
-        }
-
-        TViewModel ToViewModel<TViewModel>(object source)
-        {
-            return mapper.Map<TViewModel>(source);
+            return service.MakeBooking(model);
         }
     }
 }

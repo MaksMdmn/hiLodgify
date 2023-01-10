@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace VacationRental.Api.Models.BindingModels
 {

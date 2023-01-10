@@ -9,11 +9,11 @@ namespace VacationRental.Api.Controllers
     [ApiController]
     public class CalendarController : ControllerBase
     {
-        readonly ICalendarService calendar;
+        readonly ICalendarService service;
 
-        public CalendarController(ICalendarService calendar)
+        public CalendarController(ICalendarService service)
         {
-            this.calendar = calendar;
+            this.service = service;
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace VacationRental.Api.Controllers
             if (nights <= 0)
                 throw new ApplicationException("Nights must be positive");
 
-            return calendar.Create(rentalId, start, nights);
+            return service.ComposeCalendar(rentalId, start, nights);
         }
     }
 }
