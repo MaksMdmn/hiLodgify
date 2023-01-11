@@ -1,38 +1,37 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using VacationRental.Api.Models;
+using VacationRental.Api.Models.BindingModels;
+using VacationRental.Api.Models.ViewModels;
 using Xunit;
 
-namespace VacationRental.Api.Tests
+namespace VacationRental.Tests.IntegrationTests
 {
     [Collection("Integration")]
     public class PostRentalTests
     {
-        private readonly HttpClient _client;
+        readonly HttpClient client;
 
         public PostRentalTests(IntegrationFixture fixture)
         {
-            _client = fixture.Client;
+            client = fixture.Client;
         }
 
         [Fact]
         public async Task GivenCompleteRequest_WhenPostRental_ThenAGetReturnsTheCreatedRental()
         {
-            var request = new RentalBindingModel
+            var request = new CreateRentalBindingModel
             {
                 Units = 25
             };
 
             ResourceIdViewModel postResult;
-            using (var postResponse = await _client.PostAsJsonAsync($"/api/v1/rentals", request))
+            using (var postResponse = await client.PostAsJsonAsync("/api/v1/rentals", request))
             {
                 Assert.True(postResponse.IsSuccessStatusCode);
                 postResult = await postResponse.Content.ReadAsAsync<ResourceIdViewModel>();
             }
 
-            using (var getResponse = await _client.GetAsync($"/api/v1/rentals/{postResult.Id}"))
+            using (var getResponse = await client.GetAsync($"/api/v1/rentals/{postResult.Id}"))
             {
                 Assert.True(getResponse.IsSuccessStatusCode);
 
