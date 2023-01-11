@@ -13,12 +13,14 @@ namespace VacationRental.Api.Application.Services
     {
         readonly IRentalRepository rentals;
         readonly IBookingRepository bookings;
+        
         readonly IMapper mapper;
 
         public BookingService(IRentalRepository rentals, IBookingRepository bookings, IMapper mapper)
         {
             this.rentals = rentals;
             this.bookings = bookings;
+            
             this.mapper = mapper;
         }
 
@@ -41,16 +43,7 @@ namespace VacationRental.Api.Application.Services
 
             return ToViewModel(booking.Id);
         }
-
-        Booking BookUnit(int rentalId, int unit, DateTime start, int night)
-        {
-            var booking = new Booking(rentalId, unit, start, night);
-            
-            booking.Id = bookings.Add(booking);
-
-            return booking;
-        }
-
+        
         int FindAvailableUnit(Rental rental, DateTime start, int nights)
         {
             var prepared = rental.FindPreparedUnits(start, nights);
@@ -62,6 +55,15 @@ namespace VacationRental.Api.Application.Services
                 throw new ApplicationException("Not available");
 
             return availableUnits.First();
+        }
+
+        Booking BookUnit(int rentalId, int unit, DateTime start, int night)
+        {
+            var booking = new Booking(rentalId, unit, start, night);
+            
+            booking.Id = bookings.Add(booking);
+
+            return booking;
         }
         
         void SchedulePreparation(Rental rental, DateTime from, int unit)

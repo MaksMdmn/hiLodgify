@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.TestHost;
 using VacationRental.Api;
 using Xunit;
 
-namespace VacationRental.Tests.Api.IntegrationTests
+namespace VacationRental.Tests.IntegrationTests
 {
     [CollectionDefinition("Integration")]
     public sealed class IntegrationFixture : IDisposable, ICollectionFixture<IntegrationFixture>

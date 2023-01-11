@@ -4,7 +4,7 @@ using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
 
-namespace VacationRental.Tests.Api.IntegrationTests
+namespace VacationRental.Tests.IntegrationTests
 {
     [Collection("Integration")]
     public class PostRentalTests

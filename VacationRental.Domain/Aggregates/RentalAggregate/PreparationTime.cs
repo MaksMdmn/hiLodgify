@@ -5,9 +5,9 @@ namespace VacationRental.Domain.Aggregates.RentalAggregate
 {
     public class PreparationTime : IValueObject
     {
-        public DateTime Start { get; }
+        public DateTime Start { get; private set; }
         
-        public int Unit { get; }
+        public int Unit { get; private set; }
 
         public int Days { get; private set; }
         

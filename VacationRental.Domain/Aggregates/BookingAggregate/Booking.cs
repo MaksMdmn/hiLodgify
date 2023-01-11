@@ -7,11 +7,11 @@ namespace VacationRental.Domain.Aggregates.BookingAggregate
     {
         public int Id { get; set; }
 
-        public int RentalId { get; }
+        public int RentalId { get; private set; }
         
-        public int Unit { get; }
+        public int Unit { get; private set; }
 
-        public DateTime Start { get; }
+        public DateTime Start { get; private set; }
         
         public int Nights { get; private set; }
         
