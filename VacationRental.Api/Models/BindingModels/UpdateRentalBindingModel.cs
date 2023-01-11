@@ -2,7 +2,6 @@
 
 namespace VacationRental.Api.Models.BindingModels
 {
-    // I considered that partial update is not allowed
     public class UpdateRentalBindingModel
     {
         [Range(1 , int.MaxValue)]

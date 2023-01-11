@@ -95,7 +95,6 @@ namespace VacationRental.Api.Application.Services
         
         Booking[] UpcomingBookings(DateTime from, int rentalId)
         {
-            // I skipped part of bookings which are already opened 
             return bookings
                 .GetManyByRenalId(rentalId)
                 .Where(booking => booking.Start >= from || booking.IsOngoing(from))

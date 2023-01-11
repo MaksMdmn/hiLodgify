@@ -30,7 +30,6 @@ namespace VacationRental.Api.Controllers
         }
         
         
-        //Response was not specified, so I did is as I thought would be right
         [HttpPost]
         [Route("{rentalId:int}")]
         public RentalViewModel Put(int rentalId, UpdateRentalBindingModel model)
