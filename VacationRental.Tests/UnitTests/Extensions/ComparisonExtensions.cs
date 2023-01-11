@@ -18,19 +18,5 @@ namespace VacationRental.Tests.UnitTests.Extensions
                 return false;
             }
         }
-
-        public static bool EquivalentExcludingMissingMembers<TActual, TExpected>(this TActual actual, TExpected expected, params string[] properties)
-        {
-            try
-            {
-                actual.Should().BeEquivalentTo(expected, options => options.ExcludingMissingMembers());
-
-                return true;
-            }
-            catch (XunitException)
-            {
-                return false;
-            }
-        }
     }
 }
