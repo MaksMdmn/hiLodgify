@@ -5,7 +5,7 @@ using VacationRental.Api.Models.BindingModels;
 using VacationRental.Api.Models.ViewModels;
 using Xunit;
 
-namespace VacationRental.Api.Tests.IntegrationTests
+namespace VacationRental.Tests.Api.IntegrationTests
 {
     [Collection("Integration")]
     public class GetCalendarTests

@@ -6,7 +6,7 @@ using VacationRental.Api.Models.ViewModels;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace VacationRental.Api.Tests.IntegrationTests
+namespace VacationRental.Tests.Api.IntegrationTests
 {
     [Collection("Integration")]
     public class PostBookingTests
