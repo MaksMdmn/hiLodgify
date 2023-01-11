@@ -42,42 +42,43 @@ namespace VacationRental.Api.Application.Services
         public RentalViewModel Update(int rentalId, UpdateRentalBindingModel model)
         {
             var date = Today();
-            var upcoming = UpcomingBookings(rentalId, date);
-            var duration = BookedPeriodInDays(upcoming, date);
             
-            var simulation = SimulateBookings(upcoming, model.PreparationTimeInDays);
-
-            for (var day = 0; day <= duration; day++)
-            {
-                var bookingsPerDay = simulation.Count(
-                    booking => booking.IsOngoing(date.AddDays(day)));
-
-                if (bookingsPerDay > model.Units)
-                    throw new ApplicationException("Unable to change rental units value as it would affect existing bookings");
-            }
+            CheckBookingOverlap(date, rentalId, model.Units, model.PreparationTimeInDays);
 
             var rental = UpdateRental(rentalId, date, model);
 
             return ToViewModel<RentalViewModel>(rental);
         }
 
-        static Booking[] SimulateBookings(Booking[] data, int adjustNights)
+        void CheckBookingOverlap(DateTime from, int rentalId, int updatedUnits, int updatedPreparationTimeInDays)
         {
-            var copy = data.DeepCopy();
-                
-            foreach (var booking in data)
-            {
-                booking.SetNights(booking.Nights + adjustNights);
-            }
+            var upcoming = UpcomingBookings(from, rentalId);
 
-            return copy;
+            var simulation = SimulateBookings(upcoming, updatedPreparationTimeInDays);
+
+            var dates = simulation.Select(booking => booking.Start)
+                .Concat(simulation.Select(booking => booking.End))
+                .Distinct();
+
+            foreach (var date in dates)
+            {
+                var bookingsPerDay = simulation.Count(booking => booking.IsOngoing(date));
+
+                if (bookingsPerDay > updatedUnits)
+                    throw new ApplicationException("Unable to change rental units value as it would affect existing bookings");
+            }
         }
 
-        static int BookedPeriodInDays(Booking[] upcoming, DateTime from)
+        static Booking[] SimulateBookings(Booking[] data, int additionalNights)
         {
-            //Simplest, but not the best approach
-            return 1 + upcoming.Max(booking => booking.End)
-                .Subtract(from).Days;
+            var simulation = data.DeepCopy();
+                
+            foreach (var simulatedBooking in simulation)
+            {
+                simulatedBooking.SetNights(simulatedBooking.Nights + additionalNights);
+            }
+
+            return simulation;
         }
         
         Rental UpdateRental(int rentalId, DateTime date, UpdateRentalBindingModel model)
@@ -92,7 +93,7 @@ namespace VacationRental.Api.Application.Services
             return rental;
         }
         
-        Booking[] UpcomingBookings(int rentalId, DateTime from)
+        Booking[] UpcomingBookings(DateTime from, int rentalId)
         {
             // I skipped part of bookings which are already opened 
             return bookings
