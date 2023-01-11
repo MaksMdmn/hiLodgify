@@ -27,9 +27,6 @@ namespace VacationRental.Api.Controllers
         [HttpPost]
         public ResourceIdViewModel Post(BookingBindingModel model)
         {
-            if (model.Nights <= 0)
-                throw new ApplicationException("Nights must be positive");
-
             return service.MakeBooking(model);
         }
     }
